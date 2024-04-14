@@ -8,12 +8,18 @@
 import SwiftUI
 
 struct EmojiMemoryGameView: View {
-    var viewModel: EmojiMemoryGame = EmojiMemoryGame()
+    @ObservedObject var viewModel: EmojiMemoryGame
     
     var body: some View {
         VStack {
             // Allows for user to scroll
-            ScrollView { cards }
+            ScrollView {
+                cards
+            }
+            //button is a user intent
+            Button("Shuffle"){
+                viewModel.shuffle()
+            }
         }
         .padding()
     }
@@ -21,10 +27,11 @@ struct EmojiMemoryGameView: View {
     var cards: some View {
         // creates a vertically scrollable collection of views
         // lazy implies that the views are only created when SwiftUI needs to display them
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 85))]) {
+        LazyVGrid(columns: [GridItem(.adaptive(minimum: 90), spacing: 0)], spacing: 0) {
             ForEach(viewModel.Cards.indices, id: \.self) { index in
-                CardView(card: viewModel.Cards[index])
+                CardView(viewModel.Cards[index])
                     .aspectRatio(2/3, contentMode: .fit)
+                    .padding(4)
             }
         }
         .foregroundColor(.orange)
@@ -36,21 +43,28 @@ struct CardView: View {
     
     let base = RoundedRectangle(cornerRadius: 12)
     
+    init(_ card: MemoryGame<String>.Card) {
+        self.card = card
+    }
     var body: some View {
         ZStack {
             Group {
                 base.fill(.white)
                 base.strokeBorder(lineWidth: 2)
-                Text(card.content).font(.largeTitle)
+                Text(card.content)
+                    .font(.system(size: 200))
+                    .minimumScaleFactor(0.01)
+                    .aspectRatio(1, contentMode: .fit)
             }
-            .opacity(card.isFacedUp ? 1:0)
-            base.fill().opacity(card.isFacedUp ? 0:1)
+                .opacity(card.isFacedUp ? 1:0)
+            base.fill()
+                .opacity(card.isFacedUp ? 0:1)
         }
     }
 }
 
 struct EmojiMemoryGameView_Previews: PreviewProvider {
     static var previews: some View {
-        EmojiMemoryGameView()
+        EmojiMemoryGameView(viewModel: EmojiMemoryGame())
     }
 }

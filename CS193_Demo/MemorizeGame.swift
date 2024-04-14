@@ -19,8 +19,15 @@ struct MemoryGame <CardContent> {
         
     }
     
+    //MARK: -Any function modify the model should be marked with mutating
+    
+    mutating func shuffle() {
+        cards.shuffle()
+        print(cards)
+    }
+    
     struct Card {
-        var isFacedUp = false
+        var isFacedUp = true
         var isMatched = false
         let content: CardContent
     }
